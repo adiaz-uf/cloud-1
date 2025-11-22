@@ -1,54 +1,19 @@
 ---
-- name: Simple Docker Container Management
-  hosts: test_container
-  gather_facts: yes
+- name: Run a hello world script
+  hosts: targets
   become: yes
 
   tasks:
-      - name: Update package cache
-        apt:
-            update_cache: yes
-            cache_valid_time: 3600
-        when: ansible_os_family == "Debian"
-
-      - name: Install essential packages
-        apt:
-            name:
-                - curl
-                - wget
-                - htop
-            state: present
-            update_cache: yes
-        when: ansible_os_family == "Debian"
-
-      - name: Create a test user
-        user:
-            name: testuser
-            comment: "Test User"
-            shell: /bin/bash
-            state: present
-
-      - name: Create a sample file
+      - name: Copy the hello script to the target
         copy:
-            content: |
-                Hello from Ansible!
-                This file was created on {{ ansible_date_time.iso8601 }}
-            dest: /tmp/ansible_test.txt
-            owner: root
-            group: root
-            mode: "0644"
+            src: ./hello.sh
+            dest: /tmp/hello.sh
+            mode: "0755"
 
-      - name: Display container information
+      - name: Execute the hello script
+        command: /tmp/hello.sh
+        register: script_output
+
+      - name: Show the script output
         debug:
-            msg: |
-                Container OS: {{ ansible_distribution }} {{ ansible_distribution_version }}
-                Hostname: {{ ansible_hostname }}
-                Total Memory: {{ ansible_memtotal_mb }} MB
-
-      - name: Check disk space
-        command: df -h /
-        register: disk_result
-
-      - name: Show disk space
-        debug:
-            var: disk_result.stdout_lines
+            msg: "{{ script_output.stdout_lines }}"
