@@ -1,5 +1,6 @@
 [targets]
-localhost ansible_port=22 ansible_user=ansible_user ansible_password=password ansible_connection=ssh
+aws-server ansible_host=<EC2_PUBLIC_IP> ansible_user=ubuntu ansible_ssh_private_key_file=~/Descargas/cloud-1.pem ansible_connection=ssh
 
 [targets:vars]
 ansible_python_interpreter=/usr/bin/python3
+domain_name=<EC2_PUBLIC_IP>
