@@ -1,0 +1,94 @@
+services:
+  nginx:
+    container_name: nginx
+    build: ./requirements/nginx/.
+    image: nginx
+    ports:
+        - "443:443"
+        - "80:80"
+    depends_on:
+        - wordpress
+        - phpmyadmin
+    volumes:
+        - wordpress:/var/www/html
+        - phpmyadmin:/var/www/phpmyadmin
+    restart: always
+    networks:
+        - network
+    env_file: .env
+    environment:
+        - DOMAIN_NAME=${DOMAIN_NAME}
+
+  mariadb:
+    container_name: mariadb
+    build:
+        context: ./requirements/mariadb/.
+    image: mariadb
+    volumes:
+        - mariadb:/var/lib/mysql
+    networks:
+        - network
+    restart: always
+    env_file: .env
+    expose:
+        - "3306"
+
+  wordpress:
+    container_name: wordpress
+    build: ./requirements/wordpress/.
+    image: wordpress
+    depends_on:
+      - mariadb
+    volumes:
+      - wordpress:/var/www/html
+    networks:
+      - network
+    restart: always
+    env_file: .env
+    expose:
+      - "9000"
+
+  phpmyadmin:
+    container_name: phpmyadmin
+    build:
+      context: ./requirements/phpmyadmin
+      dockerfile: Dockerfile
+    depends_on:
+      - mariadb
+    networks:
+      - network
+    restart: always
+    env_file: .env
+    environment:
+      MYSQL_HOSTNAME: ${MYSQL_HOSTNAME}
+    volumes:
+      - phpmyadmin:/var/www/phpmyadmin
+    expose:
+      - "9000"
+
+volumes:
+  mariadb:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${DATA_PATH}/mysql
+      o: bind
+
+  wordpress:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${DATA_PATH}/wordpress
+      o: bind
+
+  phpmyadmin:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${DATA_PATH}/phpmyadmin
+      o: bind
+
+networks:
+  network:
+    name: network
+    driver: bridge
