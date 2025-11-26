@@ -7,7 +7,7 @@ COPY ./tools/launch_nginx.sh /var/www/
 
 RUN chmod +x /var/www/launch_nginx.sh
 
-EXPOSE 443 80
+EXPOSE 443 80 8080
 
 ENTRYPOINT [ "/var/www/launch_nginx.sh" ]
 

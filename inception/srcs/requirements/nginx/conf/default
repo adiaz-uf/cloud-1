@@ -1,7 +1,7 @@
 # WordPress
 server {
-    listen 443 ssl;
-    listen [::]:443 ssl;
+    listen 443 ssl default_server;
+    listen [::]:443 ssl default_server;
     server_name _;
 
     ssl_certificate /etc/ssl/certs/nginx.crt;
@@ -34,8 +34,8 @@ server {
 
 # PHPMyAdmin
 server {
-    listen 443 ssl;
-    listen [::]:443 ssl;
+    listen 8080 ssl;
+    listen [::]:8080 ssl;
     server_name _;
 
     ssl_certificate /etc/ssl/certs/nginx.crt;
@@ -67,8 +67,8 @@ server {
 
 # Redirect HTTP to HTTPS
 server {
-    listen 80;
-    listen [::]:80;
+    listen 80 default_server;
+    listen [::]:80 default_server;
     server_name _;
-    return 301 https://$server_name$request_uri;
+    return 301 https://$host$request_uri;
 }
