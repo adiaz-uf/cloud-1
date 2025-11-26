@@ -1,0 +1,52 @@
+---
+- name: Create application directory
+  file:
+      path: "{{ app_dir }}"
+      state: directory
+      owner: ubuntu
+      group: ubuntu
+      mode: "0755"
+
+- name: Create data directories for volumes
+  file:
+      path: "{{ data_path }}/{{ item }}"
+      state: directory
+      owner: ubuntu
+      group: ubuntu
+      mode: "0755"
+  loop:
+      - mysql
+      - wordpress
+      - phpmyadmin
+
+- name: Copy Dockerfiles and configurations
+  copy:
+      src: "{{ item.src }}"
+      dest: "{{ app_dir }}/{{ item.dest }}"
+      owner: ubuntu
+      group: ubuntu
+  loop:
+      - { src: "nginx/", dest: "nginx/" }
+      - { src: "mariadb/", dest: "mariadb/" }
+      - { src: "wordpress/", dest: "wordpress/" }
+      - { src: "phpmyadmin/", dest: "phpmyadmin/" }
+
+- name: Generate docker-compose.yml from template
+  template:
+      src: docker-compose.yml.j2
+      dest: "{{ app_dir }}/docker-compose.yml"
+      owner: ubuntu
+      group: ubuntu
+      mode: "0644"
+
+- name: Build and start Docker containers
+  community.docker.docker_compose_v2:
+    project_src: "{{ app_dir }}"
+    build: always
+    state: present
+  become_user: ubuntu
+
+- name: Ensure containers restart on boot
+  service:
+      name: docker
+      enabled: yes

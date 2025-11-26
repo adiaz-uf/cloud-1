@@ -1,0 +1,34 @@
+---
+- name: Install UFW firewall
+  apt:
+      name: ufw
+      state: present
+
+- name: Allow SSH through firewall
+  ufw:
+      rule: allow
+      port: "22"
+      proto: tcp
+
+- name: Allow HTTP traffic
+  ufw:
+      rule: allow
+      port: "80"
+      proto: tcp
+
+- name: Allow HTTPS traffic
+  ufw:
+      rule: allow
+      port: "443"
+      proto: tcp
+
+- name: Enable UFW
+  ufw:
+      state: enabled
+
+- name: Ensure database port is not exposed to public
+  ufw:
+      rule: deny
+      port: "3306"
+      proto: tcp
+      from_ip: any

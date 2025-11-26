@@ -8,6 +8,6 @@ install-deps:
 	venv/bin/pip install -r requirements.txt
 
 ansible:
-	ansible-playbook -i anisble/inventory ansible/playbook.yml
+	ansible-playbook -i ansible/inventory ansible/deploy.yml
 
-.PHONY: all create-venv install-deps
+.PHONY: all create-venv install-deps ansible

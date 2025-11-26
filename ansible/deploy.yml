@@ -1,0 +1,26 @@
+---
+- name: Wordpress in cloud provider
+  hosts: targets
+  become: yes
+  gather_facts: yes
+
+  pre_tasks:
+      - name: Update apt cache
+        apt:
+            update_cache: yes
+            cache_valid_time: 3600
+
+      - name: Ensure Python pip is installed
+        apt:
+            name: python3-pip
+            state: present
+
+  roles:
+      - docker-setup
+      - security
+      - wordpress-stack
+
+  post_tasks:
+      - name: Display info
+        debug:
+            msg: "WordPress is now accessible at https://{{ domain_name }}"
