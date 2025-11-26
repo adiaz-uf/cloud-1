@@ -1,30 +1,41 @@
 ---
+- name: Check if running in a container or environment without iptables support
+  shell: "[ -e /proc/sys/kernel/unprivileged_userns_clone ] || systemd-detect-virt -c"
+  register: container_check
+  failed_when: false
+  changed_when: false
+
 - name: Install UFW firewall
   apt:
       name: ufw
       state: present
+  when: container_check.rc != 0
 
 - name: Allow SSH through firewall
   ufw:
       rule: allow
       port: "22"
       proto: tcp
+  when: container_check.rc != 0
 
 - name: Allow HTTP traffic
   ufw:
       rule: allow
       port: "80"
       proto: tcp
+  when: container_check.rc != 0
 
 - name: Allow HTTPS traffic
   ufw:
       rule: allow
       port: "443"
       proto: tcp
+  when: container_check.rc != 0
 
 - name: Enable UFW
   ufw:
       state: enabled
+  when: container_check.rc != 0
 
 - name: Ensure database port is not exposed to public
   ufw:
@@ -32,3 +43,9 @@
       port: "3306"
       proto: tcp
       from_ip: any
+  when: container_check.rc != 0
+
+- name: Display warning if firewall cannot be configured
+  debug:
+      msg: "WARNING: Skipping firewall configuration - running in container or restricted environment"
+  when: container_check.rc == 0
