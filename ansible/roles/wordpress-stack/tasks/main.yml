@@ -19,32 +19,72 @@
       - wordpress
       - phpmyadmin
 
-- name: Copy Dockerfiles and configurations
+- name: Copy requirements directory with Dockerfiles
   copy:
-      src: "{{ item.src }}"
-      dest: "{{ app_dir }}/{{ item.dest }}"
+      src: "{{ inception_src_path }}/requirements/"
+      dest: "{{ app_dir }}/requirements/"
       owner: ubuntu
       group: ubuntu
-  loop:
-      - { src: "nginx/", dest: "nginx/" }
-      - { src: "mariadb/", dest: "mariadb/" }
-      - { src: "wordpress/", dest: "wordpress/" }
-      - { src: "phpmyadmin/", dest: "phpmyadmin/" }
+      mode: preserve
 
-- name: Generate docker-compose.yml from template
-  template:
-      src: docker-compose.yml.j2
+- name: Copy docker-compose.yml
+  copy:
+      src: "{{ inception_src_path }}/docker-compose.yml"
       dest: "{{ app_dir }}/docker-compose.yml"
       owner: ubuntu
       group: ubuntu
       mode: "0644"
+
+- name: Copy .env file
+  template:
+      src: .env.j2
+      dest: "{{ app_dir }}/.env"
+      owner: ubuntu
+      group: ubuntu
+      mode: "0600"
+
+- name: Check if systemd is available
+  command: systemctl --version
+  register: systemd_check
+  failed_when: false
+  changed_when: false
+
+- name: Ensure Docker service is started (systemd)
+  service:
+      name: docker
+      state: restarted
+      enabled: yes
+  when: systemd_check.rc == 0
+
+- name: Wait for Docker socket to be available
+  wait_for:
+      path: /var/run/docker.sock
+      state: present
+      timeout: 30
+  when: systemd_check.rc == 0
+
+- name: Set correct permissions on Docker socket
+  file:
+      path: /var/run/docker.sock
+      mode: "0666"
+  when: systemd_check.rc == 0
 
 - name: Build and start Docker containers
   community.docker.docker_compose_v2:
     project_src: "{{ app_dir }}"
     build: always
     state: present
-  become_user: ubuntu
+  environment:
+    DOCKER_HOST: "unix:///var/run/docker.sock"
+  when: systemd_check.rc == 0
+
+- name: Display message for non-systemd environments
+  debug:
+      msg: |
+        WARNING: systemd not available - Docker containers not started.
+        For local testing, run: cd {{ app_dir }} && docker-compose up -d --build
+        This playbook will work correctly when deployed to AWS EC2 instances.
+  when: systemd_check.rc != 0
 
 - name: Ensure containers restart on boot
   service:

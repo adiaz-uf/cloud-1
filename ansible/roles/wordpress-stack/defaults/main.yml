@@ -1,0 +1,6 @@
+---
+# Default variables for wordpress-stack role
+app_dir: /home/ubuntu/inception
+data_path: /home/ubuntu/data
+inception_src_path: "{{ playbook_dir }}/../inception/srcs"
+domain_name: "{{ ansible_facts['default_ipv4']['address'] | default('localhost') }}"
