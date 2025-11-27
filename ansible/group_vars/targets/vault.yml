@@ -1,0 +1,17 @@
+# Encrypted secrets with Ansible Vault 
+# ADVICE: Credentials included in this file are 
+# just examples, not real ones :)
+
+# MySQL/MariaDB passwords
+vault_mysql_password: "adiaz123"
+vault_mysql_root_password: "adiazroot"
+
+# WordPress Admin credentials
+vault_wp_admin_user: "adiaz-uf_wordpress"
+vault_wp_admin_password: "adiaz"
+vault_wp_admin_email: "adiaz-uf@42madrid.com"
+
+# WordPress Additional user
+vault_wp_user: "adiaz-uf"
+vault_wp_user_email: "email@gmail.com"
+vault_wp_user_password: "adiaz"

@@ -1,0 +1,18 @@
+# Public variables using vault secrets
+
+# MySQL/MariaDB
+mysql_user: "adiaz-uf"
+mysql_database: "wordpress"
+mysql_hostname: "mariadb"
+mysql_password: "{{ vault_mysql_password }}"
+mysql_root_password: "{{ vault_mysql_root_password }}"
+
+# WordPress
+wordpress_title: "Adiaz-ufPage"
+wp_admin_user: "{{ vault_wp_admin_user }}"
+wp_admin_password: "{{ vault_wp_admin_password }}"
+wp_admin_email: "{{ vault_wp_admin_email }}"
+
+wp_user: "{{ vault_wp_user }}"
+wp_user_email: "{{ vault_wp_user_email }}"
+wp_user_password: "{{ vault_wp_user_password }}"

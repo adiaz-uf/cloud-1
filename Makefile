@@ -10,4 +10,24 @@ install-deps:
 ansible:
 	ansible-playbook -i ansible/inventory ansible/deploy.yml
 
-.PHONY: all create-venv install-deps ansible
+# Ansible vault
+ansible-vault:
+	@if [ -f .vault_pass ]; then \
+		ansible-playbook -i ansible/inventory ansible/deploy.yml --vault-password-file .vault_pass; \
+	else \
+		ansible-playbook -i ansible/inventory ansible/deploy.yml --ask-vault-pass; \
+	fi
+
+setup-vault:
+	@chmod +x scripts/setup-vault.sh
+	@./scripts/setup-vault.sh
+
+edit-vault:
+	@chmod +x scripts/edit-vault.sh
+	@./scripts/edit-vault.sh
+
+view-vault:
+	@chmod +x scripts/view-vault.sh
+	@./scripts/view-vault.sh
+
+.PHONY: all create-venv install-deps ansible ansible-vault setup-vault edit-vault view-vault
