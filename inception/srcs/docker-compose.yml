@@ -46,6 +46,8 @@ services:
       - network
     restart: always
     env_file: .env
+    environment:
+      - DOMAIN_NAME=${DOMAIN_NAME}
     expose:
       - "9000"
 
