@@ -7,37 +7,38 @@ bind-address  = mariadb
 port          = 3306
 user          = root
 
-# Optimización para instancias pequeñas (< 1GB RAM)
-# Buffer Pool - Memoria principal para cachear datos
+# Optimization for small instances (< 1GB RAM)
+
+# Buffer Pool - Main memory for data caching
 innodb_buffer_pool_size = 128M
 innodb_log_file_size = 32M
 innodb_flush_method = O_DIRECT
 innodb_flush_log_at_trx_commit = 2
 
-# Conexiones
+# Connections
 max_connections = 25
 connect_timeout = 10
 
-# Cache de tablas
+# Table cache
 table_open_cache = 400
 table_definition_cache = 400
 
-# Query cache (acelera consultas repetidas)
+# Query cache (accelerates repeated queries)
 query_cache_type = 1
 query_cache_size = 32M
 query_cache_limit = 2M
 
-# Thread cache (reutilizar conexiones)
+# Thread cache (reuse connections)
 thread_cache_size = 8
 
-# Tablas temporales
+# Temporary tables
 tmp_table_size = 16M
 max_heap_table_size = 16M
 
-# Logs (desactivar en producción para más velocidad)
+# Logs (disable in production for speed)
 slow_query_log = 0
 general_log = 0
 
-# Optimización InnoDB
+# InnoDB Optimization
 innodb_file_per_table = 1
 innodb_stats_on_metadata = 0
