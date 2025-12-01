@@ -7,11 +7,8 @@ create-venv:
 install-deps:
 	venv/bin/pip install -r requirements.txt
 
-ansible:
-	ansible-playbook -i ansible/inventory ansible/deploy.yml
-
 # Ansible vault
-ansible-vault:
+ansible:
 	@if [ -f .vault_pass ]; then \
 		ansible-playbook -i ansible/inventory ansible/deploy.yml --vault-password-file .vault_pass; \
 	else \
